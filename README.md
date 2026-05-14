@@ -29,7 +29,7 @@ Návod pro budoucí mě (kdybych to chtěla rozjet jinde) nebo pro někoho, kdo 
 ## Co se kde mění
 
 - **Barvy a typografie:** `:root` blok v `css/style.css`. Zbytek stylu sahá jen na proměnné, takže redesign = editace toho jednoho bloku.
-- **Hlavní titulek + rotující podtitul:** `<h1>` v `index.html` a `SUBTITLES` pole v `js/app.js`.
+- **Titulek + podtitul:** oba v `index.html` (`<h1>` a `<p class="subtitle">`).
 - **Logika rezervace:** `toggle_reserved()` v `supabase/setup.sql`. Idempotentní — druhé volání rezervaci zruší.
 - **Admin UI:** `admin/index.html` + `js/admin.js`. Inline edit ukládá na blur, toast dole potvrzuje.
 

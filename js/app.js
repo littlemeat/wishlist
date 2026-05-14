@@ -1,12 +1,4 @@
 (function () {
-  const SUBTITLES = [
-    'Sezóna dárkové paniky',
-    'Tady, ulehčuju ti to',
-    'Lepší než nákupní centrum',
-    'Nemusíš přemýšlet, mám to vyřešený za tebe',
-    'Bez tipů, jen seznam',
-  ];
-
   const state = {
     items: [],
     selectedTags: new Set(),
@@ -15,7 +7,6 @@
   const $items = document.getElementById('items');
   const $filters = document.getElementById('filters');
   const $empty = document.getElementById('empty');
-  const $subtitle = document.getElementById('subtitle');
   const $modal = document.getElementById('reserve-modal');
   const $form = document.getElementById('reserve-form');
   const $name = document.getElementById('reserver-name');
@@ -30,8 +21,6 @@
   });
 
   async function init() {
-    $subtitle.textContent = SUBTITLES[Math.floor(Math.random() * SUBTITLES.length)];
-
     if (!window.sb) {
       showFatal('Chybí konfigurace Supabase. Zkopíruj js/config.example.js → js/config.js.');
       return;
@@ -130,11 +119,6 @@
       img.alt = '';
       img.loading = 'lazy';
       li.appendChild(img);
-    } else {
-      const ph = document.createElement('span');
-      ph.className = 'thumb thumb--empty';
-      ph.setAttribute('aria-hidden', 'true');
-      li.appendChild(ph);
     }
 
     const body = document.createElement('div');
