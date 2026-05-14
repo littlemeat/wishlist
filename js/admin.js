@@ -38,6 +38,15 @@
       return;
     }
 
+    // Wire form/button handlers FIRST, synchronously, so a click or Enter
+    // hitting the form during the getSession() await can't slip through to
+    // native form submission (which would put email + password in the URL).
+    $loginForm.addEventListener('submit', onLogin);
+    $logoutBtn.addEventListener('click', () => window.sb.auth.signOut());
+    $newBtn.addEventListener('click', onNew);
+    $forgotLink.addEventListener('click', onForgot);
+    $recoveryForm.addEventListener('submit', onRecoverySubmit);
+
     window.sb.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
         inRecovery = true;
@@ -54,12 +63,6 @@
       if (data.session) await showAdmin();
       else showLogin();
     }
-
-    $loginForm.addEventListener('submit', onLogin);
-    $logoutBtn.addEventListener('click', () => window.sb.auth.signOut());
-    $newBtn.addEventListener('click', onNew);
-    $forgotLink.addEventListener('click', onForgot);
-    $recoveryForm.addEventListener('submit', onRecoverySubmit);
   }
 
   function showLogin() {
