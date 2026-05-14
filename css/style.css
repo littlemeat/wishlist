@@ -13,6 +13,8 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+[hidden] { display: none !important; }
+
 html, body {
   margin: 0;
   padding: 0;
@@ -338,16 +340,22 @@ dialog menu {
 }
 
 /* Admin */
+#login-section {
+  margin-top: 32px;
+  max-width: 320px;
+}
 #login-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  max-width: 320px;
+  gap: 18px;
 }
 #login-form label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+}
+#login-form > div {
+  margin-top: 6px;
 }
 #admin-section {
   display: flex;

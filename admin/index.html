@@ -18,14 +18,14 @@
     </header>
 
     <section id="login-section">
-      <form id="login-form">
+      <form id="login-form" autocomplete="on">
         <label>
           <span class="dialog-label">Email</span>
-          <input type="email" id="email" required autocomplete="email">
+          <input type="email" id="email" name="email" required autocomplete="username">
         </label>
         <label>
           <span class="dialog-label">Heslo</span>
-          <input type="password" id="password" required autocomplete="current-password">
+          <input type="password" id="password" name="password" required autocomplete="current-password">
         </label>
         <div>
           <button type="submit" class="btn-outline">Přihlásit</button>
