@@ -8,8 +8,21 @@
   const $newBtn = document.getElementById('new-btn');
   const $logoutBtn = document.getElementById('logout-btn');
   const $table = document.getElementById('admin-table');
+  const $toast = document.getElementById('toast');
 
   let items = [];
+  let toastTimer = null;
+
+  function toast(msg, kind) {
+    if (!$toast) return;
+    $toast.textContent = msg;
+    $toast.className = 'toast' + (kind === 'err' ? ' toast--err' : '');
+    $toast.hidden = false;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      $toast.hidden = true;
+    }, kind === 'err' ? 4000 : 1400);
+  }
 
   init().catch((err) => console.error(err));
 
@@ -208,32 +221,35 @@
       .eq('id', id);
     if (error) {
       console.error(error);
-      alert('Uložení selhalo: ' + error.message);
+      toast('Uložení selhalo: ' + error.message, 'err');
       return;
     }
     const idx = items.findIndex((x) => x.id === id);
     if (idx !== -1) items[idx][key] = value;
+    toast('Uloženo');
   }
 
   async function destroy(id) {
     if (!confirm('Fakt smazat?')) return;
     const { error } = await window.sb.from('wishlist_items').delete().eq('id', id);
     if (error) {
-      alert('Smazání selhalo: ' + error.message);
+      toast('Smazání selhalo: ' + error.message, 'err');
       return;
     }
     items = items.filter((x) => x.id !== id);
     render();
+    toast('Smazáno');
   }
 
   async function unreserve(id) {
     const { error } = await window.sb.rpc('toggle_reserved', { item_id: id, by_name: '' });
     if (error) {
-      alert('Odrezervování selhalo: ' + error.message);
+      toast('Odrezervování selhalo: ' + error.message, 'err');
       return;
     }
     await loadItems();
     render();
+    toast('Odrezervováno');
   }
 
   async function move(id, delta) {
@@ -272,10 +288,11 @@
       .select()
       .single();
     if (error) {
-      alert('Vytvoření selhalo: ' + error.message);
+      toast('Vytvoření selhalo: ' + error.message, 'err');
       return;
     }
     items.push(data);
     render();
+    toast('Přidáno');
   }
 })();

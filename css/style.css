@@ -405,3 +405,25 @@ dialog menu {
   flex-wrap: wrap;
 }
 .muted { color: var(--muted); font-size: 13px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  z-index: 1000;
+  max-width: calc(100% - 32px);
+  box-shadow: 0 2px 8px rgba(10, 20, 36, 0.08);
+}
+.toast--err {
+  background: var(--price);
+}
+.toast[hidden] { display: none; }
