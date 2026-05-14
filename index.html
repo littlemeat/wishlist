@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marie chce</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5/400.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5/500.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5/400-italic.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>Marie chce</h1>
+      <p class="subtitle" id="subtitle"></p>
+    </header>
+
+    <nav id="filters" class="filters" aria-label="Filtry"></nav>
+
+    <ul id="items" class="items"></ul>
+
+    <p id="empty" class="empty" hidden>Gratuluju, vybral/a sis filtr, ke kterému nic nemám.</p>
+
+    <footer>
+      <button type="button" id="surprise" class="btn-outline btn-small">Překvap mě</button>
+    </footer>
+  </main>
+
+  <dialog id="reserve-modal">
+    <form id="reserve-form">
+      <h2>Beru si to</h2>
+      <label>
+        <span class="dialog-label">Jak se říkáš? (nepovinné, ať vím, komu pak děkovat)</span>
+        <input type="text" id="reserver-name" autocomplete="name" maxlength="80">
+      </label>
+      <menu>
+        <button type="button" id="reserve-cancel" class="btn-link">Zpátky</button>
+        <button type="submit" class="btn-outline">Rezervovat</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
