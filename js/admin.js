@@ -104,6 +104,28 @@
     row.className = 'admin-row';
     row.dataset.id = it.id;
 
+    const header = document.createElement('div');
+    header.className = 'admin-row-header';
+
+    const indexEl = document.createElement('span');
+    indexEl.className = 'admin-row-index';
+    indexEl.textContent = String(idx + 1).padStart(2, '0');
+    header.appendChild(indexEl);
+
+    const titleEl = document.createElement('span');
+    titleEl.className = 'admin-row-title';
+    titleEl.textContent = it.title || '(bez názvu)';
+    header.appendChild(titleEl);
+
+    if (it.reserved) {
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = it.reserved_by
+        ? 'Rezervováno — ' + it.reserved_by
+        : 'Rezervováno';
+      header.appendChild(badge);
+    }
+
     const order = document.createElement('div');
     order.className = 'admin-order';
     const up = orderBtn('↑', () => move(it.id, -1));
@@ -112,7 +134,9 @@
     if (idx === items.length - 1) down.disabled = true;
     order.appendChild(up);
     order.appendChild(down);
-    row.appendChild(order);
+    header.appendChild(order);
+
+    row.appendChild(header);
 
     const fields = document.createElement('div');
     fields.className = 'admin-fields';
@@ -129,7 +153,11 @@
       const tgt = e.target;
       const key = tgt.dataset && tgt.dataset.key;
       if (!key) return;
-      saveField(it.id, key, parseFieldValue(key, tgt));
+      const newVal = parseFieldValue(key, tgt);
+      saveField(it.id, key, newVal);
+      if (key === 'title') {
+        titleEl.textContent = newVal || '(bez názvu)';
+      }
     });
 
     row.appendChild(fields);
@@ -137,12 +165,6 @@
     const actions = document.createElement('div');
     actions.className = 'admin-actions';
     if (it.reserved) {
-      const status = document.createElement('span');
-      status.className = 'badge';
-      status.textContent = it.reserved_by
-        ? 'Rezervováno — ' + it.reserved_by
-        : 'Rezervováno';
-      actions.appendChild(status);
       const un = document.createElement('button');
       un.type = 'button';
       un.className = 'btn-link';
