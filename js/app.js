@@ -212,7 +212,7 @@
       const undo = document.createElement('button');
       undo.type = 'button';
       undo.className = 'btn-link';
-      undo.textContent = 'Zruším rezervaci';
+      undo.textContent = 'Ruším rezervaci';
       undo.addEventListener('click', () => doToggle(it.id, ''));
       actions.appendChild(undo);
     } else {
