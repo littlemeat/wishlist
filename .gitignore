@@ -1,5 +1,6 @@
 .DS_Store
 .idea/
 .vscode/
+.claude/
 wishlist-claude-code-prompt.md
 

@@ -235,6 +235,8 @@ a.title:hover { text-decoration: underline; text-decoration-thickness: 0.5px; }
   padding: 0;
 }
 .btn-link:hover { color: var(--ink); }
+.btn-link--danger { color: var(--price); }
+.btn-link--danger:hover { color: var(--price); text-decoration-thickness: 1px; }
 
 .btn-icon {
   background: transparent;
@@ -386,9 +388,14 @@ dialog menu {
   font-family: var(--font-display);
   font-variant-numeric: tabular-nums;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--accent);
   font-style: italic;
   min-width: 22px;
+}
+.admin-row-header .badge {
+  background: var(--price);
+  color: var(--accent-text);
+  border-color: var(--price);
 }
 .admin-row-title {
   font-family: var(--font-display);
@@ -441,8 +448,8 @@ dialog menu {
   left: 50%;
   bottom: 24px;
   transform: translateX(-50%);
-  background: var(--ink);
-  color: var(--bg);
+  background: var(--accent);
+  color: var(--accent-text);
   padding: 8px 16px;
   border-radius: 999px;
   font-size: 12px;

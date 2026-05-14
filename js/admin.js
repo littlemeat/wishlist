@@ -174,7 +174,7 @@
     }
     const del = document.createElement('button');
     del.type = 'button';
-    del.className = 'btn-link';
+    del.className = 'btn-link btn-link--danger';
     del.textContent = 'Smazat';
     del.addEventListener('click', () => destroy(it.id));
     actions.appendChild(del);
