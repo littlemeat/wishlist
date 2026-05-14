@@ -18,6 +18,7 @@
   let items = [];
   let toastTimer = null;
   let inRecovery = false;
+  const expanded = new Set();
 
   function toast(msg, kind) {
     if (!$toast) return;
@@ -169,8 +170,9 @@
   }
 
   function renderRow(it, idx) {
+    const isExpanded = expanded.has(it.id);
     const row = document.createElement('div');
-    row.className = 'admin-row';
+    row.className = 'admin-row' + (isExpanded ? ' admin-row--expanded' : '');
     row.dataset.id = it.id;
 
     const header = document.createElement('div');
@@ -193,7 +195,32 @@
         ? 'Rezervováno — ' + it.reserved_by
         : 'Rezervováno';
       header.appendChild(badge);
+    } else {
+      if (it.price_tier) {
+        const p = document.createElement('span');
+        p.className = 'admin-row-price';
+        p.textContent = it.price_tier;
+        header.appendChild(p);
+      }
+      if ((it.tags || []).length) {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = it.tags[0];
+        header.appendChild(tag);
+      }
     }
+
+    const posInput = document.createElement('input');
+    posInput.type = 'number';
+    posInput.className = 'admin-position-input';
+    posInput.value = it.position;
+    posInput.title = 'Pořadí';
+    posInput.addEventListener('click', (e) => e.stopPropagation());
+    posInput.addEventListener('change', () => {
+      const n = parseInt(posInput.value, 10);
+      if (Number.isFinite(n)) saveField(it.id, 'position', n);
+    });
+    header.appendChild(posInput);
 
     const order = document.createElement('div');
     order.className = 'admin-order';
@@ -203,7 +230,17 @@
     if (idx === items.length - 1) down.disabled = true;
     order.appendChild(up);
     order.appendChild(down);
+    order.addEventListener('click', (e) => e.stopPropagation());
     header.appendChild(order);
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'admin-toggle';
+    toggle.setAttribute('aria-label', isExpanded ? 'Sbalit' : 'Rozbalit');
+    toggle.textContent = '▾';
+    header.appendChild(toggle);
+
+    header.addEventListener('click', () => toggleExpand(it.id));
 
     row.appendChild(header);
 
@@ -215,7 +252,6 @@
     fields.appendChild(field('image_url', 'Obrázek (URL)', it.image_url, 'url'));
     fields.appendChild(field('variant', 'Varianta', it.variant, 'text'));
     fields.appendChild(field('tags', 'Tagy (odděl čárkou)', (it.tags || []).join(', '), 'text'));
-    fields.appendChild(field('position', 'Pořadí', it.position, 'number'));
     fields.appendChild(field('note', 'Poznámka', it.note, 'textarea'));
 
     fields.addEventListener('change', (e) => {
@@ -250,6 +286,16 @@
     row.appendChild(actions);
 
     return row;
+  }
+
+  function toggleExpand(id) {
+    if (expanded.has(id)) expanded.delete(id);
+    else expanded.add(id);
+    const row = document.querySelector(`.admin-row[data-id="${id}"]`);
+    if (!row) return;
+    row.classList.toggle('admin-row--expanded');
+    const toggle = row.querySelector('.admin-toggle');
+    if (toggle) toggle.setAttribute('aria-label', expanded.has(id) ? 'Sbalit' : 'Rozbalit');
   }
 
   function orderBtn(label, onClick) {
@@ -328,6 +374,7 @@
       return;
     }
     items = items.filter((x) => x.id !== id);
+    expanded.delete(id);
     render();
     toast('Smazáno');
   }
@@ -383,7 +430,17 @@
       return;
     }
     items.push(data);
+    expanded.add(data.id);
     render();
+    const newRow = document.querySelector(`.admin-row[data-id="${data.id}"]`);
+    if (newRow) {
+      const nameInput = newRow.querySelector('[data-key="title"]');
+      if (nameInput) {
+        nameInput.focus();
+        nameInput.select();
+        newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
     toast('Přidáno');
   }
 })();

@@ -6,6 +6,7 @@
   --accent-text: #FFFFFF;
   --price: #C76A38;
   --border: rgba(10, 20, 36, 0.1);
+  --border-radius-lg: 14px;
 
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: system-ui, -apple-system, sans-serif;
@@ -305,7 +306,8 @@ dialog select,
 .admin-field input,
 .admin-field textarea,
 .admin-field select,
-#login-form input {
+#login-form input,
+#recovery-form input {
   width: 100%;
   font: inherit;
   font-size: 14px;
@@ -321,7 +323,8 @@ dialog select:focus,
 .admin-field input:focus,
 .admin-field textarea:focus,
 .admin-field select:focus,
-#login-form input:focus {
+#login-form input:focus,
+#recovery-form input:focus {
   outline: 1px solid var(--accent);
   outline-offset: 1px;
   border-color: var(--accent);
@@ -394,17 +397,43 @@ dialog menu {
   margin-bottom: 16px;
 }
 .admin-row {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 26px 0 30px;
-  border-top: 1px solid var(--border);
+  padding: 12px 0;
+  border-top: 0.5px solid var(--border);
+  transition: background-color 200ms ease, padding 150ms ease;
 }
-#admin-table > .admin-row:first-child { border-top: 0; padding-top: 8px; }
+#admin-table > .admin-row:first-child { border-top: 0; }
+
+.admin-row .admin-fields,
+.admin-row .admin-actions { display: none; }
+
+.admin-row--expanded {
+  background: #FFFFFF;
+  border-radius: var(--border-radius-lg);
+  border-top-color: transparent;
+  padding: 20px 22px 22px;
+  margin: 10px 0;
+}
+.admin-row--expanded + .admin-row { border-top-color: transparent; }
+.admin-row--expanded .admin-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+  margin-top: 18px;
+}
+.admin-row--expanded .admin-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
 .admin-row-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  cursor: pointer;
+  min-height: 28px;
 }
 .admin-row-index {
   font-family: var(--font-display);
@@ -413,12 +442,15 @@ dialog menu {
   color: var(--accent);
   font-style: italic;
   min-width: 22px;
+  flex-shrink: 0;
 }
 .admin-row-header .badge {
   background: var(--price);
   color: var(--accent-text);
   border-color: var(--price);
+  flex-shrink: 0;
 }
+.admin-row-header > .tag { flex-shrink: 0; }
 .admin-row-title {
   font-family: var(--font-display);
   font-weight: 500;
@@ -430,19 +462,68 @@ dialog menu {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.admin-row-price {
+  color: var(--price);
+  font-weight: 500;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.admin-position-input {
+  width: 50px;
+  padding: 4px 6px;
+  font: inherit;
+  font-size: 12px;
+  text-align: center;
+  border: 0.5px solid var(--border);
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 4px;
+  flex-shrink: 0;
+  appearance: textfield;
+  -moz-appearance: textfield;
+  cursor: text;
+}
+.admin-row--expanded .admin-position-input { background: #FFFFFF; }
+.admin-position-input::-webkit-outer-spin-button,
+.admin-position-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.admin-position-input:focus {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
 .admin-order {
   display: flex;
   gap: 4px;
   flex-shrink: 0;
+  cursor: default;
 }
+.admin-toggle {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--muted);
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 11px;
+  flex-shrink: 0;
+  transition: transform 150ms ease, color 150ms ease;
+}
+.admin-toggle:hover { color: var(--ink); }
+.admin-row--expanded .admin-toggle { transform: rotate(180deg); }
+
 .admin-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 14px;
+  /* set when expanded above */
 }
 .admin-field--wide { grid-column: 1 / -1; }
 @media (max-width: 480px) {
-  .admin-fields { grid-template-columns: 1fr; }
+  .admin-row--expanded .admin-fields { grid-template-columns: 1fr; }
   .admin-field--wide { grid-column: auto; }
 }
 .admin-field {
@@ -450,17 +531,16 @@ dialog menu {
   flex-direction: column;
   gap: 4px;
 }
+.admin-row--expanded .admin-field input,
+.admin-row--expanded .admin-field textarea,
+.admin-row--expanded .admin-field select {
+  background: #FFFFFF;
+}
 .admin-label {
   font-size: 11px;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-}
-.admin-actions {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
 }
 .muted { color: var(--muted); font-size: 13px; }
 
