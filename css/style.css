@@ -342,9 +342,31 @@ dialog menu {
 }
 
 /* Admin */
-#login-section {
+#login-section,
+#recovery-section {
   margin-top: 32px;
   max-width: 320px;
+}
+#recovery-section .muted { margin: 4px 0 16px; }
+.recovery-h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 22px;
+  margin: 0;
+}
+#recovery-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+#recovery-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+#recovery-form > div { margin-top: 6px; }
+.login-extra {
+  margin: 14px 0 0;
 }
 #login-form {
   display: flex;

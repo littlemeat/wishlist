@@ -9,9 +9,15 @@
   const $logoutBtn = document.getElementById('logout-btn');
   const $table = document.getElementById('admin-table');
   const $toast = document.getElementById('toast');
+  const $forgotLink = document.getElementById('forgot-link');
+  const $recovery = document.getElementById('recovery-section');
+  const $recoveryForm = document.getElementById('recovery-form');
+  const $newPassword = document.getElementById('new-password');
+  const $newPasswordConfirm = document.getElementById('new-password-confirm');
 
   let items = [];
   let toastTimer = null;
+  let inRecovery = false;
 
   function toast(msg, kind) {
     if (!$toast) return;
@@ -32,30 +38,90 @@
       return;
     }
 
-    const { data } = await window.sb.auth.getSession();
-    if (data.session) await showAdmin();
-    else showLogin();
-
-    window.sb.auth.onAuthStateChange((_event, session) => {
+    window.sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        inRecovery = true;
+        showRecovery();
+        return;
+      }
+      if (inRecovery) return;
       if (session) showAdmin();
       else showLogin();
     });
 
+    const { data } = await window.sb.auth.getSession();
+    if (!inRecovery) {
+      if (data.session) await showAdmin();
+      else showLogin();
+    }
+
     $loginForm.addEventListener('submit', onLogin);
     $logoutBtn.addEventListener('click', () => window.sb.auth.signOut());
     $newBtn.addEventListener('click', onNew);
+    $forgotLink.addEventListener('click', onForgot);
+    $recoveryForm.addEventListener('submit', onRecoverySubmit);
   }
 
   function showLogin() {
     $login.hidden = false;
     $admin.hidden = true;
+    if ($recovery) $recovery.hidden = true;
   }
 
   async function showAdmin() {
     $login.hidden = true;
     $admin.hidden = false;
+    if ($recovery) $recovery.hidden = true;
     await loadItems();
     render();
+  }
+
+  function showRecovery() {
+    $login.hidden = true;
+    $admin.hidden = true;
+    $recovery.hidden = false;
+    setTimeout(() => $newPassword.focus(), 0);
+  }
+
+  async function onForgot(e) {
+    e.preventDefault();
+    const email = $email.value.trim();
+    if (!email) {
+      showLoginError('Vyplň email — pošlu na něj odkaz na reset.');
+      $email.focus();
+      return;
+    }
+    const redirectTo = location.origin + location.pathname;
+    const { error } = await window.sb.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) {
+      showLoginError(error.message);
+      return;
+    }
+    toast('Odkaz na reset hesla je v emailu.');
+  }
+
+  async function onRecoverySubmit(e) {
+    e.preventDefault();
+    const pwd = $newPassword.value;
+    const pwd2 = $newPasswordConfirm.value;
+    if (pwd.length < 6) {
+      toast('Heslo musí mít aspoň 6 znaků.', 'err');
+      return;
+    }
+    if (pwd !== pwd2) {
+      toast('Hesla se neshodují.', 'err');
+      return;
+    }
+    const { error } = await window.sb.auth.updateUser({ password: pwd });
+    if (error) {
+      toast('Nastavení hesla selhalo: ' + error.message, 'err');
+      return;
+    }
+    inRecovery = false;
+    $newPassword.value = '';
+    $newPasswordConfirm.value = '';
+    toast('Heslo změněno.');
+    await showAdmin();
   }
 
   function showLoginError(msg) {

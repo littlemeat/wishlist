@@ -32,6 +32,27 @@
         </div>
         <p id="login-error" class="error" hidden></p>
       </form>
+      <p class="login-extra">
+        <button type="button" id="forgot-link" class="btn-link">Zapomenuté heslo?</button>
+      </p>
+    </section>
+
+    <section id="recovery-section" hidden>
+      <h2 class="recovery-h2">Nové heslo</h2>
+      <p class="muted">Nastav si nové heslo a budeš přihlášená.</p>
+      <form id="recovery-form" autocomplete="off">
+        <label>
+          <span class="dialog-label">Nové heslo</span>
+          <input type="password" id="new-password" required autocomplete="new-password" minlength="6">
+        </label>
+        <label>
+          <span class="dialog-label">Ještě jednou pro kontrolu</span>
+          <input type="password" id="new-password-confirm" required autocomplete="new-password" minlength="6">
+        </label>
+        <div>
+          <button type="submit" class="btn-outline">Uložit nové heslo</button>
+        </div>
+      </form>
     </section>
 
     <section id="admin-section" hidden>
