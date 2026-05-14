@@ -205,18 +205,6 @@
       }
     }
 
-    const posInput = document.createElement('input');
-    posInput.type = 'number';
-    posInput.className = 'admin-position-input';
-    posInput.value = it.position;
-    posInput.title = 'Pořadí';
-    posInput.addEventListener('click', (e) => e.stopPropagation());
-    posInput.addEventListener('change', () => {
-      const n = parseInt(posInput.value, 10);
-      if (Number.isFinite(n)) saveField(it.id, 'position', n);
-    });
-    header.appendChild(posInput);
-
     const order = document.createElement('div');
     order.className = 'admin-order';
     const up = orderBtn('↑', () => move(it.id, -1));
