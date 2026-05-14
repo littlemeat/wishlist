@@ -178,11 +178,6 @@
     const header = document.createElement('div');
     header.className = 'admin-row-header';
 
-    const indexEl = document.createElement('span');
-    indexEl.className = 'admin-row-index';
-    indexEl.textContent = String(idx + 1).padStart(2, '0');
-    header.appendChild(indexEl);
-
     const titleEl = document.createElement('span');
     titleEl.className = 'admin-row-title';
     titleEl.textContent = it.title || '(bez názvu)';
@@ -237,7 +232,7 @@
     toggle.type = 'button';
     toggle.className = 'admin-toggle';
     toggle.setAttribute('aria-label', isExpanded ? 'Sbalit' : 'Rozbalit');
-    toggle.textContent = '▾';
+    toggle.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 6.5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     header.appendChild(toggle);
 
     header.addEventListener('click', () => toggleExpand(it.id));

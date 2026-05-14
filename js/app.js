@@ -45,10 +45,20 @@
     const { data, error } = await window.sb
       .from('wishlist_items')
       .select('*')
+      .order('reserved', { ascending: true })
       .order('position', { ascending: true })
       .order('created_at', { ascending: true });
     if (error) throw error;
     state.items = data || [];
+  }
+
+  function sortItems() {
+    state.items.sort((a, b) => {
+      if (a.reserved !== b.reserved) return a.reserved ? 1 : -1;
+      const posDiff = (a.position || 0) - (b.position || 0);
+      if (posDiff !== 0) return posDiff;
+      return (a.created_at || '') < (b.created_at || '') ? -1 : 1;
+    });
   }
 
   function allTags() {
@@ -257,6 +267,7 @@
     const idx = state.items.findIndex((x) => x.id === id);
     if (idx !== -1 && fresh) {
       state.items[idx] = fresh;
+      sortItems();
     } else {
       await loadItems();
     }
