@@ -248,18 +248,12 @@ a.title:hover { text-decoration: underline; text-decoration-thickness: 0.5px; }
 }
 .btn-icon:disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* Empty + footer */
 .empty {
   font-family: var(--font-display);
   font-style: italic;
   color: var(--muted);
   font-size: 14px;
   margin-top: 24px;
-}
-footer {
-  margin-top: 48px;
-  display: flex;
-  justify-content: center;
 }
 
 /* Highlight (Překvap mě) */

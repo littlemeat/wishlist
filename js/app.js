@@ -11,7 +11,6 @@
   const $form = document.getElementById('reserve-form');
   const $name = document.getElementById('reserver-name');
   const $cancel = document.getElementById('reserve-cancel');
-  const $surprise = document.getElementById('surprise');
 
   let pendingReserveId = null;
 
@@ -30,7 +29,6 @@
     renderFilters();
     renderItems();
     wireModal();
-    wireSurprise();
   }
 
   function showFatal(msg) {
@@ -90,6 +88,12 @@
         }),
       );
     }
+    const surprise = document.createElement('button');
+    surprise.type = 'button';
+    surprise.className = 'filter';
+    surprise.textContent = 'Překvap mě';
+    surprise.addEventListener('click', doSurprise);
+    $filters.appendChild(surprise);
   }
 
   function filterButton(label, active, onClick) {
@@ -274,16 +278,14 @@
     renderItems();
   }
 
-  function wireSurprise() {
-    $surprise.addEventListener('click', () => {
-      const pool = visibleItems().filter((x) => !x.reserved);
-      if (!pool.length) return;
-      const pick = pool[Math.floor(Math.random() * pool.length)];
-      const el = $items.querySelector(`[data-id="${pick.id}"]`);
-      if (!el) return;
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.classList.add('highlight');
-      setTimeout(() => el.classList.remove('highlight'), 1500);
-    });
+  function doSurprise() {
+    const pool = visibleItems().filter((x) => !x.reserved);
+    if (!pool.length) return;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    const el = $items.querySelector(`[data-id="${pick.id}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('highlight');
+    setTimeout(() => el.classList.remove('highlight'), 1500);
   }
 })();
