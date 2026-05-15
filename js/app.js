@@ -11,6 +11,8 @@
   const $form = document.getElementById('reserve-form');
   const $name = document.getElementById('reserver-name');
   const $cancel = document.getElementById('reserve-cancel');
+  const $imageModal = document.getElementById('image-modal');
+  const $imageModalImg = $imageModal.querySelector('img');
 
   let pendingReserveId = null;
 
@@ -91,7 +93,7 @@
     }
     const surprise = document.createElement('button');
     surprise.type = 'button';
-    surprise.className = 'filter';
+    surprise.className = 'filter filter--surprise';
     surprise.textContent = 'Překvap mě';
     surprise.addEventListener('click', doSurprise);
     $filters.appendChild(surprise);
@@ -131,8 +133,12 @@
       const img = document.createElement('img');
       img.className = 'thumb';
       img.src = it.image_url;
-      img.alt = '';
+      img.alt = it.title || '';
       img.loading = 'lazy';
+      img.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openImage(it.image_url, it.title);
+      });
       li.appendChild(img);
     }
 
@@ -256,6 +262,16 @@
       closeModal();
       doToggle(id, name);
     });
+    $imageModal.addEventListener('click', () => {
+      if (typeof $imageModal.close === 'function' && $imageModal.open) $imageModal.close();
+    });
+  }
+
+  function openImage(src, alt) {
+    $imageModalImg.src = src;
+    $imageModalImg.alt = alt || '';
+    if (typeof $imageModal.showModal === 'function') $imageModal.showModal();
+    else $imageModal.setAttribute('open', '');
   }
 
   async function doToggle(id, byName) {

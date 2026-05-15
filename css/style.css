@@ -79,6 +79,16 @@ h1 {
   color: var(--bg);
   border-color: var(--ink);
 }
+.filter--surprise {
+  border-color: var(--price);
+  color: var(--price);
+  margin-left: auto;
+}
+.filter--surprise:hover {
+  background: var(--price);
+  color: var(--bg);
+  border-color: var(--price);
+}
 
 /* Item list */
 .items {
@@ -117,6 +127,7 @@ h1 {
   border-radius: 4px;
   display: block;
   flex-shrink: 0;
+  cursor: zoom-in;
 }
 
 .body {
@@ -264,8 +275,32 @@ a.title:hover { text-decoration: underline; text-decoration-thickness: 0.5px; }
   transition: outline-color 150ms ease;
 }
 
-/* Modal */
-dialog {
+/* Image modal */
+.image-modal {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: visible;
+  box-shadow: none;
+  cursor: zoom-out;
+  outline: none;
+}
+.image-modal:focus { outline: none; }
+.image-modal::backdrop {
+  background: rgba(10, 20, 36, 0.7);
+}
+.image-modal-img {
+  display: block;
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: var(--border-radius-lg);
+  object-fit: contain;
+}
+
+/* Reserve modal */
+dialog:not(.image-modal) {
   border: 0.5px solid var(--border);
   background: var(--bg);
   color: var(--ink);
@@ -401,6 +436,7 @@ dialog menu {
   padding: 16px 20px;
   margin: 0 -20px;
 }
+.admin-row--expanded + .admin-row--expanded { margin-top: 12px; }
 .admin-row--deleted { opacity: 0.5; }
 .admin-row--expanded + .admin-row { border-top-color: transparent; }
 .admin-row--expanded .admin-fields {
