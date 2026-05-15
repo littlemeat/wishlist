@@ -43,6 +43,7 @@
     const { data, error } = await window.sb
       .from('wishlist_items')
       .select('*')
+      .is('deleted_at', null)
       .order('reserved', { ascending: true })
       .order('position', { ascending: true })
       .order('created_at', { ascending: true });

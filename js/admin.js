@@ -14,10 +14,12 @@
   const $recoveryForm = document.getElementById('recovery-form');
   const $newPassword = document.getElementById('new-password');
   const $newPasswordConfirm = document.getElementById('new-password-confirm');
+  const $showDeleted = document.getElementById('show-deleted');
 
   let items = [];
   let toastTimer = null;
   let inRecovery = false;
+  let showDeleted = false;
   const expanded = new Set();
 
   function toast(msg, kind) {
@@ -47,6 +49,7 @@
     $newBtn.addEventListener('click', onNew);
     $forgotLink.addEventListener('click', onForgot);
     $recoveryForm.addEventListener('submit', onRecoverySubmit);
+    $showDeleted.addEventListener('change', onToggleShowDeleted);
 
     window.sb.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -144,9 +147,9 @@
   }
 
   async function loadItems() {
-    const { data, error } = await window.sb
-      .from('wishlist_items')
-      .select('*')
+    let query = window.sb.from('wishlist_items').select('*');
+    if (!showDeleted) query = query.is('deleted_at', null);
+    const { data, error } = await query
       .order('position', { ascending: true })
       .order('created_at', { ascending: true });
     if (error) {
@@ -155,6 +158,12 @@
       return;
     }
     items = data || [];
+  }
+
+  async function onToggleShowDeleted() {
+    showDeleted = $showDeleted.checked;
+    await loadItems();
+    render();
   }
 
   function render() {
@@ -171,8 +180,11 @@
 
   function renderRow(it, idx) {
     const isExpanded = expanded.has(it.id);
+    const isDeleted = !!it.deleted_at;
     const row = document.createElement('div');
-    row.className = 'admin-row' + (isExpanded ? ' admin-row--expanded' : '');
+    row.className = 'admin-row'
+      + (isExpanded ? ' admin-row--expanded' : '')
+      + (isDeleted ? ' admin-row--deleted' : '');
     row.dataset.id = it.id;
 
     const header = document.createElement('div');
@@ -252,20 +264,36 @@
 
     const actions = document.createElement('div');
     actions.className = 'admin-actions';
-    if (it.reserved) {
-      const un = document.createElement('button');
-      un.type = 'button';
-      un.className = 'btn-link';
-      un.textContent = 'Odrezervovat';
-      un.addEventListener('click', () => unreserve(it.id));
-      actions.appendChild(un);
+    if (isDeleted) {
+      const restoreBtn = document.createElement('button');
+      restoreBtn.type = 'button';
+      restoreBtn.className = 'btn-link';
+      restoreBtn.textContent = 'Obnovit';
+      restoreBtn.addEventListener('click', () => restore(it.id));
+      actions.appendChild(restoreBtn);
+
+      const hardDel = document.createElement('button');
+      hardDel.type = 'button';
+      hardDel.className = 'btn-link btn-link--danger';
+      hardDel.textContent = 'Smazat natrvalo';
+      hardDel.addEventListener('click', () => hardDestroy(it.id));
+      actions.appendChild(hardDel);
+    } else {
+      if (it.reserved) {
+        const un = document.createElement('button');
+        un.type = 'button';
+        un.className = 'btn-link';
+        un.textContent = 'Odrezervovat';
+        un.addEventListener('click', () => unreserve(it.id));
+        actions.appendChild(un);
+      }
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'btn-link btn-link--danger';
+      del.textContent = 'Smazat';
+      del.addEventListener('click', () => destroy(it.id));
+      actions.appendChild(del);
     }
-    const del = document.createElement('button');
-    del.type = 'button';
-    del.className = 'btn-link btn-link--danger';
-    del.textContent = 'Smazat';
-    del.addEventListener('click', () => destroy(it.id));
-    actions.appendChild(del);
     row.appendChild(actions);
 
     return row;
@@ -350,7 +378,48 @@
   }
 
   async function destroy(id) {
-    if (!confirm('Fakt smazat?')) return;
+    const item = items.find((x) => x.id === id);
+    const title = (item && item.title) || 'tenhle dárek';
+    if (!confirm(`Fakt smazat „${title}"?`)) return;
+    const nowIso = new Date().toISOString();
+    const { error } = await window.sb
+      .from('wishlist_items')
+      .update({ deleted_at: nowIso })
+      .eq('id', id);
+    if (error) {
+      toast('Smazání selhalo: ' + error.message, 'err');
+      return;
+    }
+    if (showDeleted) {
+      const idx = items.findIndex((x) => x.id === id);
+      if (idx !== -1) items[idx].deleted_at = nowIso;
+    } else {
+      items = items.filter((x) => x.id !== id);
+      expanded.delete(id);
+    }
+    render();
+    toast('Smazáno');
+  }
+
+  async function restore(id) {
+    const { error } = await window.sb
+      .from('wishlist_items')
+      .update({ deleted_at: null })
+      .eq('id', id);
+    if (error) {
+      toast('Obnovení selhalo: ' + error.message, 'err');
+      return;
+    }
+    const idx = items.findIndex((x) => x.id === id);
+    if (idx !== -1) items[idx].deleted_at = null;
+    render();
+    toast('Obnoveno');
+  }
+
+  async function hardDestroy(id) {
+    const item = items.find((x) => x.id === id);
+    const title = (item && item.title) || 'tenhle dárek';
+    if (!confirm(`Smazat „${title}" natrvalo? Tohle se nedá vrátit.`)) return;
     const { error } = await window.sb.from('wishlist_items').delete().eq('id', id);
     if (error) {
       toast('Smazání selhalo: ' + error.message, 'err');
@@ -359,7 +428,7 @@
     items = items.filter((x) => x.id !== id);
     expanded.delete(id);
     render();
-    toast('Smazáno');
+    toast('Smazáno natrvalo');
   }
 
   async function unreserve(id) {
