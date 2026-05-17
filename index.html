@@ -13,17 +13,24 @@
   <main class="wrap">
     <header>
       <h1>Maruška by si přála…</h1>
-      <p class="subtitle">Tady, ulehčuju ti to</p>
+      <p class="subtitle">Tak ti to ulehčuju</p>
     </header>
 
     <nav id="filters" class="filters" aria-label="Filtry"></nav>
+    <p id="filter-hint" class="filter-hint" hidden>Jen dárky se všemi vybranými značkami.</p>
+    <div class="surprise-row">
+      <button type="button" id="surprise-btn" class="filter filter--surprise">Překvap mě</button>
+    </div>
 
     <ul id="items" class="items"></ul>
 
     <p id="empty" class="empty" hidden>Gratuluju, vybral/a sis filtr, ke kterému nic nemám.</p>
   </main>
 
+  <div id="toast" class="toast" hidden></div>
+
   <dialog id="image-modal" class="image-modal" aria-label="Náhled obrázku">
+    <button type="button" id="image-modal-close" class="image-modal-close" aria-label="Zavřít">×</button>
     <img class="image-modal-img" alt="">
   </dialog>
 
@@ -31,7 +38,7 @@
     <form id="reserve-form">
       <h2>Beru si to</h2>
       <label>
-        <span class="dialog-label">Jak se říkáš? (nepovinné, ať vím, komu pak děkovat)</span>
+        <span class="dialog-label">Vyplň jméno (nepovinné)</span>
         <input type="text" id="reserver-name" autocomplete="name" maxlength="80">
       </label>
       <menu>

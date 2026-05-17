@@ -12,14 +12,15 @@ Návod pro budoucí mě (kdybych to chtěla rozjet jinde) nebo pro někoho, kdo 
 1. Založ projekt na [supabase.com](https://supabase.com).
 2. V Supabase SQL editoru spusť **`supabase/setup.sql`** — tabulka `wishlist_items`, RLS a `toggle_reserved()` funkce.
 3. Spusť **`supabase/add-soft-delete.sql`** — přidá sloupec `deleted_at` pro soft delete.
-4. V Supabase → Authentication → Users → **Add user** → **Create new user**. Zaškrtni *Auto Confirm User*.
-5. Zkopíruj UID nově vytvořeného uživatele.
-6. V `supabase/make-me-admin.sql` přepiš UUID na své a spusť v SQL editoru.
-7. V `js/config.js` vyplň `SUPABASE_URL` (Project Settings → Data API → URL) a `SUPABASE_PUBLISHABLE_KEY` (Project Settings → API Keys → Publishable key).
-8. **Authentication → URL Configuration**: Site URL = `https://<user>.github.io/<repo>/`, do Redirect URLs přidej `https://<user>.github.io/<repo>/admin/`. Bez toho nefunguje reset hesla.
-9. Commitni a pushni na GitHub.
-10. Repo Settings → Pages: Source = `Deploy from a branch`, branch = `main`, folder = `/` (root).
-11. Po ~minutě bude live na `https://<user>.github.io/<repo>/`. Dárky přidáváš přes `/admin/`.
+4. Spusť **`supabase/add-hardening.sql`** — DB length / non-empty checky, composite index, atomické `admin_reorder()` RPC.
+5. V Supabase → Authentication → Users → **Add user** → **Create new user**. Zaškrtni *Auto Confirm User*.
+6. Zkopíruj UID nově vytvořeného uživatele.
+7. V `supabase/make-me-admin.sql` přepiš UUID na své a spusť v SQL editoru.
+8. V `js/config.js` vyplň `SUPABASE_URL` (Project Settings → Data API → URL) a `SUPABASE_PUBLISHABLE_KEY` (Project Settings → API Keys → Publishable key).
+9. **Authentication → URL Configuration**: Site URL = `https://<user>.github.io/<repo>/`, do Redirect URLs přidej `https://<user>.github.io/<repo>/admin/`. Bez toho nefunguje reset hesla.
+10. Commitni a pushni na GitHub.
+11. Repo Settings → Pages: Source = `Deploy from a branch`, branch = `main`, folder = `/` (root).
+12. Po ~minutě bude live na `https://<user>.github.io/<repo>/`. Dárky přidáváš přes `/admin/`.
 
 ## Co umí
 

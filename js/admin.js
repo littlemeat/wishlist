@@ -154,10 +154,14 @@
       .order('created_at', { ascending: true });
     if (error) {
       console.error(error);
-      alert('Načtení selhalo: ' + error.message);
+      toast('Načtení selhalo: ' + error.message, 'err');
       return;
     }
     items = data || [];
+    // Prune the expanded Set so it doesn't hold ids of items that aren't
+    // in the current view anymore (e.g. after toggling Zobrazit smazané).
+    const currentIds = new Set(items.map((it) => it.id));
+    for (const id of expanded) if (!currentIds.has(id)) expanded.delete(id);
   }
 
   async function onToggleShowDeleted() {
@@ -232,7 +236,7 @@
     toggle.type = 'button';
     toggle.className = 'admin-toggle';
     toggle.setAttribute('aria-label', isExpanded ? 'Sbalit' : 'Rozbalit');
-    toggle.innerHTML = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 6.5l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    toggle.innerHTML = '<svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path d="M4.5 7l4.5 4.5L13.5 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     header.appendChild(toggle);
 
     header.addEventListener('click', () => toggleExpand(it.id));
@@ -380,7 +384,7 @@
   async function destroy(id) {
     const item = items.find((x) => x.id === id);
     const title = (item && item.title) || 'tenhle dárek';
-    if (!confirm(`Fakt smazat „${title}"?`)) return;
+    if (!confirm(`Fakt smazat „${title}“?`)) return;
     const nowIso = new Date().toISOString();
     const { error } = await window.sb
       .from('wishlist_items')
@@ -419,7 +423,7 @@
   async function hardDestroy(id) {
     const item = items.find((x) => x.id === id);
     const title = (item && item.title) || 'tenhle dárek';
-    if (!confirm(`Smazat „${title}" natrvalo? Tohle se nedá vrátit.`)) return;
+    if (!confirm(`Smazat „${title}“ natrvalo? Tohle se nedá vrátit.`)) return;
     const { error } = await window.sb.from('wishlist_items').delete().eq('id', id);
     if (error) {
       toast('Smazání selhalo: ' + error.message, 'err');
@@ -443,30 +447,12 @@
   }
 
   async function move(id, delta) {
-    const idx = items.findIndex((x) => x.id === id);
-    if (idx === -1) return;
-    const swap = idx + delta;
-    if (swap < 0 || swap >= items.length) return;
-    const a = items[idx];
-    const b = items[swap];
-
-    // If positions match, give the whole list a deterministic spread first.
-    if (a.position === b.position) {
-      const updates = items.map((it, i) => ({ id: it.id, position: i * 10 }));
-      for (const u of updates) {
-        await window.sb.from('wishlist_items').update({ position: u.position }).eq('id', u.id);
-        const k = items.findIndex((x) => x.id === u.id);
-        if (k !== -1) items[k].position = u.position;
-      }
+    const { error } = await window.sb.rpc('admin_reorder', { p_id: id, p_direction: delta });
+    if (error) {
+      toast('Přesun selhal: ' + error.message, 'err');
+      return;
     }
-
-    const newA = items[swap].position;
-    const newB = items[idx].position;
-    await window.sb.from('wishlist_items').update({ position: newA }).eq('id', a.id);
-    await window.sb.from('wishlist_items').update({ position: newB }).eq('id', b.id);
-    a.position = newA;
-    b.position = newB;
-    items.sort((x, y) => x.position - y.position || (x.created_at < y.created_at ? -1 : 1));
+    await loadItems();
     render();
   }
 

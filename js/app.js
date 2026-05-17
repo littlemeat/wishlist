@@ -13,8 +13,25 @@
   const $cancel = document.getElementById('reserve-cancel');
   const $imageModal = document.getElementById('image-modal');
   const $imageModalImg = $imageModal.querySelector('img');
+  const $imageModalClose = document.getElementById('image-modal-close');
+  const $filterHint = document.getElementById('filter-hint');
+  const $surpriseBtn = document.getElementById('surprise-btn');
+  const $toast = document.getElementById('toast');
+
+  let toastTimer = null;
+  function toast(msg, kind) {
+    if (!$toast) return;
+    $toast.textContent = msg;
+    $toast.className = 'toast' + (kind === 'err' ? ' toast--err' : '');
+    $toast.hidden = false;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      $toast.hidden = true;
+    }, kind === 'err' ? 4000 : 1400);
+  }
 
   let pendingReserveId = null;
+  let pendingReserveBtn = null;
 
   init().catch((err) => {
     console.error(err);
@@ -31,6 +48,7 @@
     renderFilters();
     renderItems();
     wireModal();
+    $surpriseBtn.addEventListener('click', doSurprise);
   }
 
   function showFatal(msg) {
@@ -91,12 +109,7 @@
         }),
       );
     }
-    const surprise = document.createElement('button');
-    surprise.type = 'button';
-    surprise.className = 'filter filter--surprise';
-    surprise.textContent = 'Překvap mě';
-    surprise.addEventListener('click', doSurprise);
-    $filters.appendChild(surprise);
+    $filterHint.hidden = state.selectedTags.size < 2;
   }
 
   function filterButton(label, active, onClick) {
@@ -121,7 +134,17 @@
     const items = visibleItems();
     $empty.hidden = items.length !== 0;
     $items.innerHTML = '';
-    for (const it of items) $items.appendChild(renderCard(it));
+    let reservedHeaderShown = false;
+    for (const it of items) {
+      if (it.reserved && !reservedHeaderShown) {
+        const heading = document.createElement('li');
+        heading.className = 'items-section-heading';
+        heading.textContent = 'Rezervováno';
+        $items.appendChild(heading);
+        reservedHeaderShown = true;
+      }
+      $items.appendChild(renderCard(it));
+    }
   }
 
   function renderCard(it) {
@@ -149,7 +172,7 @@
     titleRow.className = 'title-row';
     const titleEl = document.createElement(it.link ? 'a' : 'span');
     titleEl.className = 'title';
-    titleEl.textContent = it.title;
+    titleEl.textContent = it.title || '(bez názvu)';
     if (it.link) {
       titleEl.href = it.link;
       titleEl.target = '_blank';
@@ -218,14 +241,14 @@
       undo.type = 'button';
       undo.className = 'btn-link';
       undo.textContent = 'Ruším rezervaci';
-      undo.addEventListener('click', () => doToggle(it.id, ''));
+      undo.addEventListener('click', () => doToggle(it.id, '', undo));
       actions.appendChild(undo);
     } else {
       const reserve = document.createElement('button');
       reserve.type = 'button';
       reserve.className = 'btn-outline btn-small';
       reserve.textContent = 'Rezervovat';
-      reserve.addEventListener('click', () => openModal(it.id));
+      reserve.addEventListener('click', () => openModal(it.id, reserve));
       actions.appendChild(reserve);
     }
     body.appendChild(actions);
@@ -234,8 +257,9 @@
     return li;
   }
 
-  function openModal(id) {
+  function openModal(id, btn) {
     pendingReserveId = id;
+    pendingReserveBtn = btn || null;
     $name.value = '';
     if (typeof $modal.showModal === 'function') $modal.showModal();
     else $modal.setAttribute('open', '');
@@ -246,6 +270,7 @@
     if (typeof $modal.close === 'function' && $modal.open) $modal.close();
     else $modal.removeAttribute('open');
     pendingReserveId = null;
+    pendingReserveBtn = null;
   }
 
   function wireModal() {
@@ -258,10 +283,12 @@
       e.preventDefault();
       if (!pendingReserveId) return;
       const id = pendingReserveId;
+      const btn = pendingReserveBtn;
       const name = $name.value.trim();
       closeModal();
-      doToggle(id, name);
+      doToggle(id, name, btn);
     });
+    // Click anywhere inside the lightbox closes it — backdrop, image, or ×.
     $imageModal.addEventListener('click', () => {
       if (typeof $imageModal.close === 'function' && $imageModal.open) $imageModal.close();
     });
@@ -274,25 +301,30 @@
     else $imageModal.setAttribute('open', '');
   }
 
-  async function doToggle(id, byName) {
-    const { data, error } = await window.sb.rpc('toggle_reserved', {
-      item_id: id,
-      by_name: byName || '',
-    });
-    if (error) {
-      console.error(error);
-      alert('Něco se podělalo: ' + error.message);
-      return;
+  async function doToggle(id, byName, btn) {
+    if (btn) btn.disabled = true;
+    try {
+      const { data, error } = await window.sb.rpc('toggle_reserved', {
+        item_id: id,
+        by_name: byName || '',
+      });
+      if (error) {
+        console.error(error);
+        toast('Něco se podělalo: ' + error.message, 'err');
+        return;
+      }
+      const fresh = Array.isArray(data) ? data[0] : data;
+      const idx = state.items.findIndex((x) => x.id === id);
+      if (idx !== -1 && fresh) {
+        state.items[idx] = fresh;
+        sortItems();
+      } else {
+        await loadItems();
+      }
+      renderItems();
+    } finally {
+      if (btn && btn.isConnected) btn.disabled = false;
     }
-    const fresh = Array.isArray(data) ? data[0] : data;
-    const idx = state.items.findIndex((x) => x.id === id);
-    if (idx !== -1 && fresh) {
-      state.items[idx] = fresh;
-      sortItems();
-    } else {
-      await loadItems();
-    }
-    renderItems();
   }
 
   function doSurprise() {
