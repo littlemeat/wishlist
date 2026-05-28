@@ -1,0 +1,32 @@
+name: Keep Supabase warm
+
+# Supabase free tier paused projekt po 7 dnech bez aktivity.
+# Tenhle workflow vystřelí jednoduchý GET na REST endpoint dvakrát týdně
+# (pondělí + čtvrtek), takže projekt nikdy nevykročí přes 4denní pauzu.
+#
+# Klíč i URL jsou už veřejně v js/config.js (publishable key, by design safe),
+# proto je tady inline a ne v secrets.
+
+on:
+  schedule:
+    - cron: '0 7 * * 1,4'  # pondělí + čtvrtek 07:00 UTC (~09:00 v Praze létě)
+  workflow_dispatch:  # ruční trigger z GitHub UI pro debug
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit Supabase REST
+        env:
+          SUPABASE_URL: https://vaxujjcvykatjivgkzjn.supabase.co
+          SUPABASE_KEY: sb_publishable_J_rKqoDQPJSjhgao7OXM0A_OfsuxHCQ
+        run: |
+          response=$(curl -sf -w "%{http_code}" -o /tmp/body \
+            -H "apikey: $SUPABASE_KEY" \
+            "$SUPABASE_URL/rest/v1/wishlist_items?select=id&limit=1")
+          echo "HTTP $response"
+          cat /tmp/body
+          if [ "$response" != "200" ]; then
+            echo "::error::Supabase ping failed with HTTP $response"
+            exit 1
+          fi
