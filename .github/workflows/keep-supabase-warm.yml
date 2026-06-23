@@ -9,7 +9,7 @@ name: Keep Supabase warm
 
 on:
   schedule:
-    - cron: '0 7 * * 1,4'  # pondělí + čtvrtek 07:00 UTC (~09:00 v Praze létě)
+    - cron: '0 7 * * *'  # každý den 07:00 UTC (~09:00 v Praze létě, ~08:00 v zimě)
   workflow_dispatch:  # ruční trigger z GitHub UI pro debug
 
 jobs:
