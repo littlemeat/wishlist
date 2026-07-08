@@ -288,6 +288,36 @@ a.title:hover { text-decoration: underline; text-decoration-thickness: 0.5px; }
   margin-top: 24px;
 }
 
+/* Footer link to admin */
+.site-footer {
+  margin-top: 56px;
+  padding-top: 14px;
+  border-top: 0.5px solid var(--border);
+  display: flex;
+  justify-content: center;
+}
+.site-footer a {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-underline-offset: 2px;
+}
+.site-footer a:hover { color: var(--ink); }
+
+/* Admin → wishlist back link */
+.back-link {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+.back-link a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-underline-offset: 2px;
+}
+.back-link a:hover { color: var(--ink); }
+
 /* Highlight (Překvap mě) */
 .highlight {
   outline: 1px solid var(--accent);
