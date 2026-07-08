@@ -1,16 +1,24 @@
 name: Keep Supabase warm
 
-# Supabase free tier paused projekt po 7 dnech bez aktivity.
-# Tenhle workflow vystřelí jednoduchý GET na REST endpoint dvakrát týdně
-# (pondělí + čtvrtek), takže projekt nikdy nevykročí přes 4denní pauzu.
+# Supabase free tier pausne projekt po ~7 dnech bez aktivity.
+# Tenhle workflow vystřelí jednoduchý GET na REST endpoint každý den,
+# takže projekt nikdy nedoběhne k pauze. (Denní frekvence empiricky ověřená —
+# Mon+Thu nestačilo, projekt zaspal v Thu→Mon gapu.)
+#
+# Druhá past: GitHub automaticky vypíná scheduled workflows po 60 dnech
+# bez commitů v repu. Proto si workflow jednou za ~3 týdny udělá prázdný
+# keepalive commit — drží tím naživu sám sebe.
 #
 # Klíč i URL jsou už veřejně v js/config.js (publishable key, by design safe),
-# proto je tady inline a ne v secrets.
+# proto jsou tady inline a ne v secrets.
 
 on:
   schedule:
     - cron: '0 7 * * *'  # každý den 07:00 UTC (~09:00 v Praze létě, ~08:00 v zimě)
   workflow_dispatch:  # ruční trigger z GitHub UI pro debug
+
+permissions:
+  contents: write  # kvůli keepalive commitu
 
 jobs:
   ping:
@@ -29,4 +37,23 @@ jobs:
           if [ "$response" != "200" ]; then
             echo "::error::Supabase ping failed with HTTP $response"
             exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Keepalive commit when repo idles too long
+        run: |
+          last_commit=$(git log -1 --format=%ct)
+          now=$(date +%s)
+          days=$(( (now - last_commit) / 86400 ))
+          echo "Days since last commit: $days"
+          if [ "$days" -ge 21 ]; then
+            git config user.name "keep-warm-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git commit --allow-empty -m "chore: keepalive — GitHub vypíná neaktivní crony po 60 dnech"
+            git push
+            echo "Keepalive commit pushed."
+          else
+            echo "Repo is active enough, no commit needed."
           fi
