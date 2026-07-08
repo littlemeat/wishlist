@@ -309,6 +309,7 @@ a.title:hover { text-decoration: underline; text-decoration-thickness: 0.5px; }
 .back-link {
   margin: 8px 0 0;
   font-size: 13px;
+  text-align: right;
 }
 .back-link a {
   color: var(--muted);

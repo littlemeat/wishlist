@@ -1,9 +1,10 @@
 name: Keep Supabase warm
 
 # Supabase free tier pausne projekt po ~7 dnech bez aktivity.
-# Tenhle workflow vystřelí jednoduchý GET na REST endpoint každý den,
-# takže projekt nikdy nedoběhne k pauze. (Denní frekvence empiricky ověřená —
-# Mon+Thu nestačilo, projekt zaspal v Thu→Mon gapu.)
+# Empiricky ověřeno (červen + červenec 2026): anonymní REST ČTENÍ se do
+# aktivity NEPOČÍTÁ — projekt zaspal pár hodin po úspěšném GET pingu.
+# Proto cron dělá ZÁPIS: volá keepalive_ping() (viz supabase/add-keepalive.sql),
+# která updatne timestamp. GET zůstává jako fallback/reachability check.
 #
 # Druhá past: GitHub automaticky vypíná scheduled workflows po 60 dnech
 # bez commitů v repu. Proto si workflow jednou za ~3 týdny udělá prázdný
@@ -24,18 +25,28 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Hit Supabase REST
+      - name: Write-ping Supabase (RPC keepalive_ping + GET fallback)
         env:
           SUPABASE_URL: https://vaxujjcvykatjivgkzjn.supabase.co
           SUPABASE_KEY: sb_publishable_J_rKqoDQPJSjhgao7OXM0A_OfsuxHCQ
         run: |
-          response=$(curl -sf -w "%{http_code}" -o /tmp/body \
+          rpc=$(curl -s -o /tmp/rpc -w "%{http_code}" -X POST \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "$SUPABASE_URL/rest/v1/rpc/keepalive_ping")
+          echo "RPC keepalive_ping: HTTP $rpc — $(cat /tmp/rpc)"
+          if [ "$rpc" = "404" ]; then
+            echo "::warning::keepalive_ping() v DB neexistuje — spusť supabase/add-keepalive.sql v SQL editoru"
+          fi
+
+          get=$(curl -s -o /tmp/get -w "%{http_code}" \
             -H "apikey: $SUPABASE_KEY" \
             "$SUPABASE_URL/rest/v1/wishlist_items?select=id&limit=1")
-          echo "HTTP $response"
-          cat /tmp/body
-          if [ "$response" != "200" ]; then
-            echo "::error::Supabase ping failed with HTTP $response"
+          echo "REST read: HTTP $get — $(cat /tmp/get)"
+
+          if [ "$rpc" != "200" ] && [ "$get" != "200" ]; then
+            echo "::error::Supabase nedostupná (RPC $rpc, GET $get) — projekt nejspíš spí"
             exit 1
           fi
 
