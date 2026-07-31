@@ -200,6 +200,8 @@ a.title:hover { text-decoration: underline; text-decoration-thickness: 0.5px; }
   gap: 4px;
   margin-top: 4px;
 }
+/* Bílá na modré má kontrast ~2.8:1, tedy pod WCAG AA. Je to záměr — pastelový
+   vzhled byl v zadání. Neopravovat ztmavením --accent ani tmavým textem. */
 .tag {
   background: var(--accent);
   color: var(--accent-text);

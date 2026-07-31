@@ -1,5 +1,11 @@
--- Marie chce — Supabase setup
--- Paste into the Supabase SQL editor and run once.
+-- Maruška by si přála… — Supabase setup
+-- Paste into the Supabase SQL editor and run ONCE, as the first migration.
+--
+-- POZOR, dvě věci při opakovaném spuštění na běžící databázi:
+--  1. Přepíše admin policy zpátky na placeholder UUID níž → zamkne tě to
+--     z adminu. Náprava: spustit znovu make-me-admin.sql.
+--  2. Přepíše toggle_reserved() na starší verzi bez ořezu reserved_by.
+--     Živá verze je v add-hardening.sql — spusť po tomhle znovu i ji.
 
 create extension if not exists pgcrypto;
 
@@ -40,6 +46,7 @@ create policy wishlist_admin_all
 
 -- Belt-and-suspenders: deny direct writes from anon at the privilege level.
 -- The only mutation path for visitors is toggle_reserved() below.
+-- (Ta verze níž je původní; add-hardening.sql ji později nahradí novější.)
 revoke insert, update, delete on public.wishlist_items from anon;
 grant select on public.wishlist_items to anon;
 

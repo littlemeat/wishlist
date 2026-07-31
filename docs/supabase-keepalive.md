@@ -51,7 +51,9 @@ Vytvoř `.github/workflows/keep-supabase-warm.yml`. Nahraď dva placeholdery:
 
 Publishable klíč je bezpečný k veřejnému vystavení (chrání ho RLS), takže může být v YAML natvrdo. **Nikdy tam nedávej `service_role` ani `secret` klíč.** Pokud by ses přece jen cítila líp se secretem, dej klíč do repo Settings → Secrets and variables → Actions a referencuj `${{ secrets.SUPABASE_KEY }}`.
 
-Poznámka: GET fallback níž předpokládá tabulku `keepalive` z kroku 1, takže funguje v každém projektu bez úprav — kdyby RPC neexistovala, aspoň ověří dostupnost.
+Poznámka: GET fallback níž čte tabulku `keepalive` z kroku 1, takže funguje v každém projektu bez úprav — kdyby RPC neexistovala, aspoň ověří dostupnost. (Workflow v tomhle repu čte místo toho `wishlist_items`; funkčně je to jedno, jen tady chci verzi, která nezávisí na schématu konkrétní aplikace.)
+
+K oprávněním: `permissions: contents: write` v YAML stačí samo — keepalive commit projde i v repu, které má Settings → Actions → General → Workflow permissions na *Read-only*. To repo nastavení je jen default pro workflow, které si oprávnění nevyžádají, ne strop. (Ověřeno v provozu 30. 7. 2026.) Výjimka: ve forku z pull requestu zápis nedostaneš vůbec, ale tam scheduled workflow neběží.
 
 ```yaml
 name: Keep Supabase warm
