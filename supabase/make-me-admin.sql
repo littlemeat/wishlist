@@ -1,7 +1,15 @@
--- Run AFTER signing up via /admin/.
--- 1. Find your UID: Supabase dashboard → Authentication → Users → click your row.
--- 2. Replace the literal below with that UID.
--- 3. Paste into the SQL editor and run.
+-- Zapne admin práva pro jedno konkrétní UUID. Spusť po setup.sql.
+--
+-- Uživatel se NEregistruje na /admin/ — ta stránka umí jen přihlášení. Účet
+-- vytvoř v Supabase dashboard → Authentication → Users → Add user →
+-- Create new user (zaškrtni Auto Confirm User).
+--
+-- 1. Najdi UID: Authentication → Users → klikni na svůj řádek.
+-- 2. Přepiš literál níž tím UID (je na dvou místech).
+-- 3. Vlož do SQL editoru a spusť.
+--
+-- UUID níž je Mariino. Nová instance ho musí přepsat, jinak nikdo nebude admin.
+-- Spusť tenhle soubor znovu i po každém opakovaném spuštění setup.sql.
 
 drop policy if exists wishlist_admin_all on public.wishlist_items;
 
