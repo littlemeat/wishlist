@@ -54,7 +54,7 @@ přepsat a znovu spustit ten soubor. Správné řešení (tabulka `profiles` s `
 zbytečná infrastruktura pro jednoho člověka.
 
 **Editace v adminu nemá debounce ani řešení konfliktů.**
-Ukládá se na blur každého políčka, poslední zápis vyhrává. Dvě otevřené záložky si můžou
+Ukládá se na `change` každého políčka, poslední zápis vyhrává. Dvě otevřené záložky si můžou
 navzájem přepsat změny. Jeden uživatel = nikdy se to nestane.
 
 **Tagy jsou `text[]`, ne normalizovaná tabulka.**
@@ -152,13 +152,14 @@ Bez toho se mail pošle, ale odkaz v něm nikam nevede a uživatel nedostane ž�
 
 ## 4. Kdyby se to mělo nasadit znovu odjinud
 
-README má setup postup od nuly. Dvě věci v něm nejsou, protože se týkají jen klonování
-téhle konkrétní instance:
+README má setup postup od nuly a zmiňuje i to, co je potřeba přepsat. Pro úplnost: na třech
+místech jsou natvrdo hodnoty **téhle** instance a nová instalace je musí vyměnit, jinak bude
+sahat na moji databázi.
 
-- `.github/workflows/keep-supabase-warm.yml` má na řádcích s `SUPABASE_URL` a `SUPABASE_KEY`
-  hodnoty **mého** projektu. Nová instance je musí přepsat, jinak bude držet vzhůru cizí
-  databázi.
-- `supabase/make-me-admin.sql` má natvrdo **můj** UID (viz výše).
+- `js/config.js` — project URL a publishable klíč.
+- `.github/workflows/keep-supabase-warm.yml` — totéž podruhé, v `env` bloku. Rotace klíče
+  znamená přepsat obojí.
+- `supabase/make-me-admin.sql` — moje UID, na dvou řádcích.
 
 Původní zadání projektu (`wishlist-claude-code-prompt.md`) je záměrně mimo git. Nic tajného
 v něm není, jen je to interní brief — všechno podstatné z něj se dostalo do README, do
