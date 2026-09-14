@@ -1,4 +1,8 @@
 # GitHub podle tohohle souboru vykreslí tlačítko „Sponsor" nahoře na repozitáři.
 # Cílí na lidi, co si projekt chtějí postavit taky — ne na návštěvníky wishlistu,
 # ti na stránce žádnou výzvu k podpoře nevidí a vidět nemají.
+#
+# Revolut je tu proto, že registrace na Buy Me a Coffee zatím není dotažená.
+# Až bude, můžou zůstat oba — tlačítko nabídne obě možnosti vedle sebe.
 buy_me_a_coffee: littlemeat
+custom: ["https://revolut.me/marmucha"]
