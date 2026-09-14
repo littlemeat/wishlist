@@ -53,6 +53,7 @@ Návod pro budoucí mě (kdybych to chtěla rozjet jinde) nebo pro někoho, kdo 
 
 **Veřejná stránka `/`:**
 - Karty s případným obrázkem (klik → lightbox), cenovkou (€/€€/€€€), tagy, poznámkou, varianta, externí odkaz.
+- Dárek bez obrázku dostane místo prázdna vykreslenou dárkovou krabičku. Je to inline SVG (žádné soubory ke stažení), varianta se vybírá deterministicky z ID dárku — stejný dárek má vždycky stejnou krabičku, sousední dárky různé. Placeholder se nekliká, lightbox by neměl co zvětšovat.
 - Filtry podle tagů (multi-select AND), `Vše` resetuje, `Překvap mě` (oranžová pilulka vpravo) scrollne + zvýrazní náhodný nerezervovaný dárek.
 - Rezervovat / Ruším rezervaci bez přihlášení — jediná write cesta je RPC `toggle_reserved`.
 - Rezervované klesnou na konec pod vloženou italic hlavičku „Rezervováno", název se přeškrtne a karta jde na `opacity: 0.5`. Při odrezervování se vrátí na svojí pozici.
@@ -80,6 +81,7 @@ Návod pro budoucí mě (kdybych to chtěla rozjet jinde) nebo pro někoho, kdo 
 - **Titulek + podtitul:** `index.html` (`<title>`, `<h1>`, `<p class="subtitle">`) a `admin/index.html` (`<title>`, `<p class="subtitle">`). Podtitul je statický. Přejmenování projektu znamená projít obojí plus odkaz nahoře v tomhle README.
 - **Logika rezervace:** `toggle_reserved()` — živá verze je v **`supabase/add-hardening.sql`**, ta ve `setup.sql` je starší a přepsaná. Editovat `setup.sql` na běžící databázi nic neudělá. Idempotentní: druhé volání rezervaci zruší.
 - **Pořadí dárků:** `admin_reorder()` v `supabase/add-hardening.sql`, volané šipkami ↑↓. Sloupec `position` se v UI nikde nezobrazuje.
+- **Placeholder krabičky:** pole `GIFT_BOXES` v `js/app.js` (papír / vzor / stuha na variantu) a funkce `giftPattern()` se šesti vzory. Barvy sahají na tokeny přes `var()`, takže se přebarví s `:root`. Stuha musí zůstat kontrastní ke krabičce — světlá by na bílé kartě zmizela (placeholder nemá vlastní podklad).
 - **Public UI:** `index.html` + `js/app.js` + `css/style.css`.
 - **Admin UI:** `admin/index.html` + `js/admin.js` + `css/style.css` (sekce na konci souboru).
 - **Cenovky:** seznam možností je na dvou místech — `parseFieldValue` / select v `js/admin.js` a CHECK constraint ve `supabase/setup.sql`. Přidání čtvrté úrovně = obojí.

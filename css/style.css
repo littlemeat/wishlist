@@ -150,6 +150,12 @@ h1 {
   flex-shrink: 0;
   cursor: zoom-in;
 }
+/* Dárek bez obrázku: vykreslená krabička místo díry v layoutu. Není klikací,
+   lightbox by neměl co zvětšovat. Barvy si SVG bere z :root přes var(). */
+.thumb--placeholder {
+  cursor: default;
+  overflow: hidden;
+}
 
 .body {
   flex: 1;

@@ -147,6 +147,91 @@
     }
   }
 
+  // --- Placeholder dárkové krabičky ----------------------------------------
+  // Dárek bez obrázku dostane místo prázdna plochou krabičku. Kreslí se jako
+  // inline SVG — žádné externí soubory a ostré na retině. Barvy sahají na tokeny
+  // v :root, takže se placeholdery přebarví spolu se zbytkem webu.
+  //
+  // Varianta se vybírá deterministicky z ID dárku, ne náhodně: stejný dárek má
+  // vždycky stejnou krabičku (jinak by poskakovala při každém filtru a rezervaci),
+  // ale dva různé dárky vedle sebe vypadají jinak.
+
+  // Stuha a mašle jsou vždycky v kontrastní značkové barvě, ne světlé. Placeholder
+  // nemá žádnou podkladovou dlaždici (držíme pravidlo „žádná vnořená pozadí"),
+  // takže světlá mašle, která přesahuje nad víko, by se na bílé kartě ztratila.
+  const GIFT_BOXES = [
+    { paper: 'var(--accent)', mark: 'var(--bg)', ribbon: 'var(--price)',  pattern: 'solid' },
+    { paper: 'var(--accent)', mark: 'var(--bg)', ribbon: 'var(--price)',  pattern: 'diagonal' },
+    { paper: 'var(--accent)', mark: 'var(--bg)', ribbon: 'var(--price)',  pattern: 'dots' },
+    { paper: 'var(--accent)', mark: 'var(--bg)', ribbon: 'var(--price)',  pattern: 'grid' },
+    { paper: 'var(--accent)', mark: 'var(--bg)', ribbon: 'var(--price)',  pattern: 'stars' },
+    { paper: 'var(--price)',  mark: 'var(--bg)', ribbon: 'var(--accent)', pattern: 'solid' },
+    { paper: 'var(--price)',  mark: 'var(--bg)', ribbon: 'var(--accent)', pattern: 'vertical' },
+    { paper: 'var(--price)',  mark: 'var(--bg)', ribbon: 'var(--accent)', pattern: 'dots' },
+    { paper: 'var(--price)',  mark: 'var(--bg)', ribbon: 'var(--accent)', pattern: 'stars' },
+  ];
+
+  function hashIndex(str, mod) {
+    let h = 0;
+    for (let i = 0; i < str.length; i += 1) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return h % mod;
+  }
+
+  function starPath(cx, cy, r) {
+    const pts = [];
+    for (let i = 0; i < 10; i += 1) {
+      const a = (Math.PI / 5) * i - Math.PI / 2;
+      const rr = i % 2 === 0 ? r : r * 0.45;
+      pts.push(`${(cx + Math.cos(a) * rr).toFixed(2)},${(cy + Math.sin(a) * rr).toFixed(2)}`);
+    }
+    return `M${pts.join('L')}Z`;
+  }
+
+  // Vzor se kreslí přes celou krabičku a ořízne se clipPath na víko + tělo.
+  function giftPattern(kind, color) {
+    const p = [];
+    if (kind === 'vertical') {
+      for (let x = 19; x < 66; x += 8) p.push(`<rect x="${x}" y="24" width="3" height="43" fill="${color}"/>`);
+    } else if (kind === 'diagonal') {
+      for (let i = -3; i < 9; i += 1) {
+        const x = i * 11;
+        p.push(`<path d="M${x} 70 L${x + 26} 21" stroke="${color}" stroke-width="3.6" fill="none"/>`);
+      }
+    } else if (kind === 'dots') {
+      for (let y = 29; y < 68; y += 9) {
+        for (let x = 19; x < 67; x += 9) p.push(`<circle cx="${x}" cy="${y}" r="1.9" fill="${color}"/>`);
+      }
+    } else if (kind === 'grid') {
+      for (let y = 27; y < 68; y += 6) {
+        for (let x = 17; x < 68; x += 6) p.push(`<circle cx="${x}" cy="${y}" r="1.1" fill="${color}"/>`);
+      }
+    } else if (kind === 'stars') {
+      // Mimo středový pruh stuhy (x 35,5–44,5), ať se hvězdy neschovají pod ní.
+      const spots = [[22, 31], [55, 32], [27, 47], [59, 48], [21, 60], [51, 60]];
+      for (const [cx, cy] of spots) p.push(`<path d="${starPath(cx, cy, 3.2)}" fill="${color}"/>`);
+    }
+    return p.join('');
+  }
+
+  function giftPlaceholder(it) {
+    const seed = String(it.id || it.title || '');
+    const v = GIFT_BOXES[hashIndex(seed, GIFT_BOXES.length)];
+    const uid = 'gb-' + seed.replace(/[^a-zA-Z0-9_-]/g, '');
+    const svg = `<svg class="thumb thumb--placeholder" viewBox="0 0 80 80" width="80" height="80" aria-hidden="true" focusable="false">
+<defs><clipPath id="${uid}"><rect x="11" y="24" width="58" height="12" rx="1.5"/><rect x="15" y="36" width="50" height="31" rx="1.5"/></clipPath></defs>
+<rect x="11" y="24" width="58" height="12" rx="1.5" fill="${v.paper}"/>
+<rect x="15" y="36" width="50" height="31" rx="1.5" fill="${v.paper}"/>
+<g clip-path="url(#${uid})">${giftPattern(v.pattern, v.mark)}</g>
+<rect x="35.5" y="24" width="9" height="43" fill="${v.ribbon}"/>
+<path d="M40 25 C 36 18 28 9 23.5 13 C 19.5 16.8 29 22.5 40 25 Z" fill="none" stroke="${v.ribbon}" stroke-width="3.4" stroke-linejoin="round"/>
+<path d="M40 25 C 44 18 52 9 56.5 13 C 60.5 16.8 51 22.5 40 25 Z" fill="none" stroke="${v.ribbon}" stroke-width="3.4" stroke-linejoin="round"/>
+<circle cx="40" cy="25" r="2.8" fill="${v.ribbon}"/>
+</svg>`;
+    const holder = document.createElement('div');
+    holder.innerHTML = svg;
+    return holder.firstElementChild;
+  }
+
   function renderCard(it) {
     const li = document.createElement('li');
     li.className = 'card' + (it.reserved ? ' card--reserved' : '');
@@ -163,6 +248,9 @@
         openImage(it.image_url, it.title);
       });
       li.appendChild(img);
+    } else {
+      // Placeholder se nekliká — v lightboxu není co zvětšovat.
+      li.appendChild(giftPlaceholder(it));
     }
 
     const body = document.createElement('div');
