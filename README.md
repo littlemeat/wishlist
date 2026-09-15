@@ -1,6 +1,6 @@
-# Maruška by si přála…
+# Seznam přání
 
-Osobní wishlist Marie. Statické HTML/CSS/JS na GitHub Pages, Supabase jako backend.
+Osobní wishlist. Statické HTML/CSS/JS na GitHub Pages, Supabase jako backend.
 Cizí lidi rezervují přes RPC bez přihlášení, já edituju přes `/admin/`.
 
 Live: <https://littlemeat.github.io/wishlist/>
