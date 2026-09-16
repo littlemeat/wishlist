@@ -27,12 +27,6 @@ sdílíš s někým z práce, přesuň projekt do vlastní osobní organizace, *
 přístup**. Notifikační maily o pauze chodí na gmail, což naznačuje osobní účet, ale ověř to
 v Supabase → Organization settings → Members.
 
-**Co se ztrácí a je to v pořádku:** projekt vznikl pod pracovním účtem Claude Code
-(`(adresa odstraněna)`) a v jeho paměti byla jediná poznámka — lekce o tom, že se
-formulářové handlery musí registrovat synchronně před `await`. Ta je zachovaná na dvou
-místech v repu: v README v sekci Bezpečnostní model a jako komentář v `js/admin.js` u
-`init()`. Nic dalšího v té paměti nebylo.
-
 ---
 
 ## 2. Vědomě přijaté kompromisy
