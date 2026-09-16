@@ -16,10 +16,13 @@ změnu práce.
 | Věc | Kde | Účet |
 |---|---|---|
 | Repo + hosting | GitHub `littlemeat/wishlist`, Pages z `main` / root | GitHub účet `littlemeat` |
-| Databáze + auth | Supabase, organizace **HSDC**, projekt **Maru wishlist** | login `(adresa odstraněna)` |
+| Databáze + auth | Supabase, organizace **HSDC**, projekt **Maru wishlist** | osobní účet vlastníka |
 | Supabase project ref | `vaxujjcvykatjivgkzjn` (je v `js/config.js` a ve workflow) | — |
-| Admin login do `/admin/` | uživatel v Supabase → Authentication → Users | `(adresa odstraněna)` |
-| Git commity | `Marie Michalova <(adresa odstraněna)>` | — |
+| Admin login do `/admin/` | uživatel v Supabase → Authentication → Users | tamtéž |
+
+Konkrétní e-mailové adresy tady schválně nejsou — repo je veřejné a nemá cenu je nabízet
+robotům ani prozrazovat, jak se jmenuje přihlašovací účet do administrace. Kdo má přístup
+do Supabase dashboardu, najde je v Authentication → Users.
 
 **Zkontroluj jednou a odškrtni:** organizace v Supabase se jmenuje `HSDC`, což vypadá jako
 firemní zkratka, ne jako osobní jméno. Pokud je ta organizace navázaná na firmu nebo ji
