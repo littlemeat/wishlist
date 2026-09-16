@@ -1,4 +1,4 @@
-# Seznam přání
+# Co bych si přála…
 
 Osobní wishlist. Statické HTML/CSS/JS na GitHub Pages, Supabase jako backend.
 Cizí lidi rezervují přes RPC bez přihlášení, já edituju přes `/admin/`.
