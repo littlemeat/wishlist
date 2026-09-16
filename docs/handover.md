@@ -4,8 +4,6 @@ Tenhle soubor existuje proto, že projekt vznikl v konverzaci s AI asistentem, k
 nepřežije. Kód a README popisují **co** aplikace dělá. Tady je **proč** je to takhle,
 **kdo** k tomu má přístup a **co dělat, když se něco rozbije**.
 
-Psáno v červenci 2026, kdy jsem projekt dokončila.
-
 ---
 
 ## 1. Přístupy a vlastnictví
@@ -24,11 +22,8 @@ Konkrétní e-mailové adresy tady schválně nejsou — repo je veřejné a nem
 robotům ani prozrazovat, jak se jmenuje přihlašovací účet do administrace. Kdo má přístup
 do Supabase dashboardu, najde je v Authentication → Users.
 
-**Zkontroluj jednou a odškrtni:** organizace v Supabase se jmenuje `HSDC`, což vypadá jako
-firemní zkratka, ne jako osobní jméno. Pokud je ta organizace navázaná na firmu nebo ji
-sdílíš s někým z práce, přesuň projekt do vlastní osobní organizace, **dokud máš ještě
-přístup**. Notifikační maily o pauze chodí na gmail, což naznačuje osobní účet, ale ověř to
-v Supabase → Organization settings → Members.
+Organizace v Supabase se jmenuje `HSDC`, což vypadá jako firemní zkratka, ale je osobní —
+ověřeno. Na firmu tedy projekt navázaný není a změnu práce přežije.
 
 ---
 
