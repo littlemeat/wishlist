@@ -54,7 +54,7 @@ Návod pro budoucí mě (kdybych to chtěla rozjet jinde) nebo pro někoho, kdo 
 **Veřejná stránka `/`:**
 - Karty s případným obrázkem (klik → lightbox), cenovkou (€/€€/€€€), tagy, poznámkou, varianta, externí odkaz.
 - Dárek bez obrázku dostane místo prázdna vykreslenou dárkovou krabičku. Je to inline SVG (žádné soubory ke stažení), varianta se vybírá deterministicky z ID dárku — stejný dárek má vždycky stejnou krabičku, sousední dárky různé. Placeholder se nekliká, lightbox by neměl co zvětšovat.
-- Filtry podle tagů (multi-select AND), `Vše` resetuje, `Překvap mě` (oranžová pilulka vpravo) scrollne + zvýrazní náhodný nerezervovaný dárek.
+- Filtry podle tagů — aktivní je vždy nejvýš jedna značka. Klik na jinou přepne, klik na tu samou ji vypne, `Vše` resetuje. `Překvap mě` (oranžová pilulka vpravo) scrollne + zvýrazní náhodný nerezervovaný dárek.
 - Rezervovat / Ruším rezervaci bez přihlášení — jediná write cesta je RPC `toggle_reserved`.
 - Rezervované klesnou na konec pod vloženou italic hlavičku „Rezervováno", název se přeškrtne a karta jde na `opacity: 0.5`. Při odrezervování se vrátí na svojí pozici.
 - V patičce nenápadný odkaz na `/admin/`.

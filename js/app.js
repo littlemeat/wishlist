@@ -1,7 +1,7 @@
 (function () {
   const state = {
     items: [],
-    selectedTags: new Set(),
+    selectedTag: null,
   };
 
   const $items = document.getElementById('items');
@@ -14,7 +14,6 @@
   const $imageModal = document.getElementById('image-modal');
   const $imageModalImg = $imageModal.querySelector('img');
   const $imageModalClose = document.getElementById('image-modal-close');
-  const $filterHint = document.getElementById('filter-hint');
   const $surpriseBtn = document.getElementById('surprise-btn');
   const $toast = document.getElementById('toast');
 
@@ -88,28 +87,31 @@
     return [...t].sort((a, b) => a.localeCompare(b, 'cs'));
   }
 
+  // Filtr je jednoduchý výběr: aktivní je vždycky nejvýš jedna značka. Dřív se
+  // daly zapnout dvě naráz a platily obě zároveň, což skoro vždycky skončilo
+  // prázdným seznamem a nikdo nechápal proč.
   function renderFilters() {
     const tags = allTags();
     $filters.innerHTML = '';
     $filters.appendChild(
-      filterButton('Vše', state.selectedTags.size === 0, () => {
-        state.selectedTags.clear();
+      filterButton('Vše', state.selectedTag === null, () => {
+        state.selectedTag = null;
         renderFilters();
         renderItems();
       }),
     );
     for (const tag of tags) {
-      const active = state.selectedTags.has(tag);
+      const active = state.selectedTag === tag;
       $filters.appendChild(
         filterButton(tag, active, () => {
-          if (active) state.selectedTags.delete(tag);
-          else state.selectedTags.add(tag);
+          // Klik na už aktivní značku ji vypne, takže se jde vrátit na „Vše"
+          // i bez trefování se do něj.
+          state.selectedTag = active ? null : tag;
           renderFilters();
           renderItems();
         }),
       );
     }
-    $filterHint.hidden = state.selectedTags.size < 2;
   }
 
   function filterButton(label, active, onClick) {
@@ -122,12 +124,8 @@
   }
 
   function visibleItems() {
-    if (state.selectedTags.size === 0) return state.items;
-    return state.items.filter((it) => {
-      const set = new Set(it.tags || []);
-      for (const sel of state.selectedTags) if (!set.has(sel)) return false;
-      return true;
-    });
+    if (state.selectedTag === null) return state.items;
+    return state.items.filter((it) => (it.tags || []).includes(state.selectedTag));
   }
 
   function renderItems() {
