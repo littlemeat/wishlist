@@ -1,4 +1,4 @@
--- Maruška by si přála… — Supabase setup
+-- Co bych si přála… — Supabase setup
 -- Paste into the Supabase SQL editor and run ONCE, as the first migration.
 --
 -- POZOR, dvě věci při opakovaném spuštění na běžící databázi:
