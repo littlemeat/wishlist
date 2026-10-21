@@ -16,6 +16,7 @@
   const $imageModalClose = document.getElementById('image-modal-close');
   const $surpriseBtn = document.getElementById('surprise-btn');
   const $toast = document.getElementById('toast');
+  const core = window.WishlistCore;
 
   let toastTimer = null;
   function toast(msg, kind) {
@@ -38,7 +39,7 @@
   });
 
   async function init() {
-    if (!window.sb) {
+    if (!window.sb || !core) {
       showFatal('Chybí konfigurace Supabase. Zkopíruj js/config.example.js → js/config.js.');
       return;
     }
@@ -70,21 +71,8 @@
     state.items = data || [];
   }
 
-  function sortItems() {
-    state.items.sort((a, b) => {
-      if (a.reserved !== b.reserved) return a.reserved ? 1 : -1;
-      const posDiff = (a.position || 0) - (b.position || 0);
-      if (posDiff !== 0) return posDiff;
-      return (a.created_at || '') < (b.created_at || '') ? -1 : 1;
-    });
-  }
-
   function allTags() {
-    const t = new Set();
-    for (const it of state.items) {
-      for (const tag of it.tags || []) t.add(tag);
-    }
-    return [...t].sort((a, b) => a.localeCompare(b, 'cs'));
+    return core.allTags(state.items);
   }
 
   // Filtr je jednoduchý výběr: aktivní je vždycky nejvýš jedna značka. Dřív se
@@ -124,8 +112,7 @@
   }
 
   function visibleItems() {
-    if (state.selectedTag === null) return state.items;
-    return state.items.filter((it) => (it.tags || []).includes(state.selectedTag));
+    return core.filterItems(state.items, state.selectedTag);
   }
 
   function renderItems() {
@@ -403,7 +390,7 @@
       const idx = state.items.findIndex((x) => x.id === id);
       if (idx !== -1 && fresh) {
         state.items[idx] = fresh;
-        sortItems();
+        state.items = core.sortItems(state.items);
       } else {
         await loadItems();
       }
@@ -414,9 +401,8 @@
   }
 
   function doSurprise() {
-    const pool = visibleItems().filter((x) => !x.reserved);
-    if (!pool.length) return;
-    const pick = pool[Math.floor(Math.random() * pool.length)];
+    const pick = core.pickUnreserved(visibleItems(), Math.random);
+    if (!pick) return;
     const el = $items.querySelector(`[data-id="${pick.id}"]`);
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });

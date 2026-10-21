@@ -24,6 +24,17 @@ python3 -m http.server 8765
 Pak <http://localhost:8765/> a <http://localhost:8765/admin/>. Používá se `js/config.js`
 z repa, takže lokální běh píše do **produkční** databáze — pozor při mazání.
 
+## Testy
+
+Bez závislostí a buildu (stačí Node.js 20+):
+
+```bash
+npm test
+```
+
+Testy kryjí řazení dárků, tagové filtry a výběr pro „Překvap mě“. Při každém pushi
+a pull requestu je spouští GitHub Actions workflow `Test wishlist`.
+
 ## Setup z čistého stavu
 
 Návod pro budoucí mě (kdybych to chtěla rozjet jinde) nebo pro někoho, kdo si tenhle pattern chce ojet:
